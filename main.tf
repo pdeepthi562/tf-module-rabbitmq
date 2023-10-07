@@ -35,8 +35,14 @@ resource "aws_instance" "main" {
   vpc_security_group_ids     = [aws_security_group.main.id]
   subnet_id                  = var.subnet_ids[0]
   tags                       = merge(local.tags, { Name = local.name_prefix })
-  user_data                  = file("${path.module}/userdata.sh")
+  user_data = base64encode(templatefile("${path.module}/userdata.sh" ,
+    {
+      component = var.component
+        env       = var.env
+
+      }))
 }
+
 
 resource "aws_route53_record" "main" {
   zone_id = var.zone_id
